@@ -48,14 +48,27 @@ Here's where you'll put images of your schematics. [Tinkercad](https://www.tinke
 Here's where you'll put your code. The syntax below places it into a block of code. Follow the guide [here]([url](https://www.markdownguide.org/extended-syntax/)) to learn how to customize it to your project needs. 
 
 ```c++
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(9600);
-  Serial.println("Hello World!");
-}
+from gpiozero import MotionSensor
+from picamera2 import Picamera2
+from picamera2 import Preview
+from picamera2.encoders import H264 encoder
+from datetime import datetime
 
-void loop() {
-  // put your main code here, to run repeatedly:
+pir = MotionSensor(4)
+picam2 = Picamera2()
+encoder = H264Encoder(bitrate=10000000)
+output = "intruder.h264"
+
+while True:
+  pir.wait_for_motion
+  print("Motion detected!")
+  filename = "{0:%c}.h264".format(datetime.now())
+  camera_config = picam2.create_preview_configuration()
+  picam2.configure(camera_config)
+  picam2.start_recording(encoder, filename)
+  pir.wait_for_no_motion()
+  picam2.stop_recording()
+  print("No motion detected")
 
 }
 ```
